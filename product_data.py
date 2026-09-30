@@ -1,20 +1,36 @@
 from bs4 import BeautifulSoup
+from enum import Enum
+
+
+class PriceType(Enum):
+    """Represents a parent css element to get targeted price type."""
+    def __add__(self, other):
+        return self.value + other
+    DEAL = "#primeSavingsUpsellAccordionRow"
+    REGULAR = "#newAccordionRow_1"
+    USED = "#usedAccordionRow"
+
 
 class ProductData:
     def __init__(self, text: str):
         self.soup = BeautifulSoup(text, "html.parser")
-        self.price = self.find_price()
 
-
-    def find_price(self) -> float:
-        whole_price_element = self.soup.select_one("span.a-price-whole")
-        fraction_price_element = self.soup.select_one("span.a-price-fraction")
+    def get_price(self, price_type: PriceType) -> str:
+        """Returns the full price of the product depending on the price type."""
+        whole_price_element = self.soup.select_one(price_type + " span.a-price-whole")
+        fraction_price_element = self.soup.select_one(price_type + " span.a-price-fraction")
 
         if whole_price_element is not None and fraction_price_element is not None:
             whole_price = whole_price_element.text.strip()
             fraction_price = fraction_price_element.text.strip()
-            total_price = float(whole_price + fraction_price)
+            total_price = whole_price + fraction_price
             return total_price
 
+        print("Failed to find price")
         raise Exception('Failed to find price')
+
+    def get_name(self) -> str:
+        title_element = self.soup.select_one("#productTitle")
+        return title_element.text.strip()
+
 

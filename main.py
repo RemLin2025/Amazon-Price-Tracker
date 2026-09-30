@@ -1,16 +1,31 @@
 import requests
-from bs4 import BeautifulSoup
 import os
+from twilio.rest import Client
+from dotenv import load_dotenv
+from product_data import ProductData, PriceType
 
-URL = "https://www.amazon.com/dp/B075CYMYK6?ref_=cm_sw_r_cp_ud_ct_FM9M699VKHTT47YD50Q6&th=1"
+load_dotenv()
+auth_token = os.getenv('TWILIO_AUTH_TOKEN')
+account_sid = os.getenv("ACCOUNT_SID")
+user_agent = os.getenv("USER_AGENT")
+URL = os.getenv("URL")
 
-USER_AGENT = os.environ.get("USER_AGENT")
 headers = {
-    'User-Agent': USER_AGENT,
+    "User-Agent": user_agent,
+    "Accept-Language": "en-US,en;q=0.9",
     }
 
 response = requests.get(URL, headers=headers)
 response.raise_for_status()
-response_text = response.text
+product_text = response.text
 
-soup = BeautifulSoup(response_text, "html.parser")
+product = ProductData(product_text)
+
+# my_number = os.environ.get("MY_NUMBER")
+# from_number = os.environ.get("FROM_NUMBER")
+# client = Client(account_sid, auth_token)
+# message = client.messages.create(
+#     to=my_number,
+#     from_=from_number,
+#     body="The ",
+# )
