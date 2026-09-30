@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 from enum import Enum
+import requests
 
 
 class PriceType(Enum):
@@ -11,9 +12,17 @@ class PriceType(Enum):
     USED = "#usedAccordionRow"
 
 
-class ProductData:
-    def __init__(self, text: str):
-        self.soup = BeautifulSoup(text, "html.parser")
+class AmazonScraper:
+    def __init__(self, url: str, headers: dict[str, str]):
+        self.url = url
+        self.headers = headers
+        self.soup = BeautifulSoup(self.fetch_html(), "html.parser")
+
+    def fetch_html(self) -> str:
+        """Fetches the HTML of the Amazon page."""
+        response = requests.get(self.url, headers=self.headers)
+        response.raise_for_status()
+        return response.text
 
     def get_price(self, price_type: PriceType) -> str:
         """Returns the full price of the product depending on the price type."""
