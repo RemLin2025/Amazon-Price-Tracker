@@ -24,7 +24,7 @@ class AmazonScraper:
         response.raise_for_status()
         return response.text
 
-    def get_price(self, price_type: PriceType) -> str:
+    def get_price(self, price_type: PriceType) -> float:
         """Returns the full price of the product depending on the price type."""
         whole_price_element = self.soup.select_one(price_type + " span.a-price-whole")
         fraction_price_element = self.soup.select_one(price_type + " span.a-price-fraction")
@@ -33,7 +33,7 @@ class AmazonScraper:
             whole_price = whole_price_element.text.strip()
             fraction_price = fraction_price_element.text.strip()
             total_price = whole_price + fraction_price
-            return total_price
+            return float(total_price)
 
         print("Failed to find price")
         raise Exception('Failed to find price')
